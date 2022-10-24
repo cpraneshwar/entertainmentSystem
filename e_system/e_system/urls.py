@@ -20,12 +20,12 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from drf_yasg.generators import OpenAPISchemaGenerator
-
+from rest_framework.authtoken import views
 
 urlpatterns = [
     path('rewards/', include('rewards.urls')),
     path('users/', include('users.urls')),
-
+    path('auth/', views.obtain_auth_token),
     path('admin/', admin.site.urls),
 ]
 
