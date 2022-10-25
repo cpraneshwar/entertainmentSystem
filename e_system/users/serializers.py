@@ -15,10 +15,10 @@ class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'password', 'password2','first_name', 'last_name')
-        extra_kwargs = {
-            'last_name': {'required': True},
-            'first_name': {'required': True}
-        }
+        #extra_kwargs = {
+            #'last_name': {'required': True},
+            #'first_name': {'required': True}
+        #}
 
     def validate(self, attrs):
         if User.objects.filter(email=attrs['email']):
