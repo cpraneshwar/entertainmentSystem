@@ -7,5 +7,5 @@ from rewards.models import Tier
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     reward_points = models.IntegerField("Reward Points", default=0)
-    tier = models.ForeignKey(Tier, on_delete=models.PROTECT)
+    tier = models.ForeignKey(Tier, on_delete=models.PROTECT, null=True)
     is_verified = models.BooleanField(default=False)

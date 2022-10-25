@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rewards',
     'users',
     'drf_yasg',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -126,3 +127,21 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        #'rest_framework.authentication.BasicAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
+    ]
+}
+
+SWAGGER_SETTINGS = {
+        'JSON_EDITOR': True,
+        'SECURITY_DEFINITIONS': {
+            'api_Key': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'Authorization'
+            },
+        },
+    }
