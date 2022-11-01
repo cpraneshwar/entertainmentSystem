@@ -21,12 +21,17 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from drf_yasg.generators import OpenAPISchemaGenerator
 from rest_framework.authtoken import views
+from django.views.static import serve
+from django.conf import settings
 
 urlpatterns = [
     path('rewards/', include('rewards.urls')),
     path('users/', include('users.urls')),
     path('auth/', views.obtain_auth_token),
     path('admin/', admin.site.urls),
+    path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
+    path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT})
+
 ]
 
 
