@@ -54,3 +54,5 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'first_name', 'last_name', 'email', 'tier', 'is_verified','reward_points')
 
 
+class VerifyProfileSerializer(serializers.Serializer):
+    otp = serializers.IntegerField(required=True)
