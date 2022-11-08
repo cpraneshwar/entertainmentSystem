@@ -27,10 +27,11 @@ from django.conf import settings
 urlpatterns = [
     path('rewards/', include('rewards.urls')),
     path('users/', include('users.urls')),
+    path('challenges/', include('challenges.urls')),
     path('auth/', views.obtain_auth_token),
     path('admin/', admin.site.urls),
-    path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
-    path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT})
+    # path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
+    # path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT})
 
 ]
 
