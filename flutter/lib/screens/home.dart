@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/screens/login.dart';
 import 'package:testapp/screens/quiz.dart';
+import 'package:testapp/screens/quizhome.dart';
 
 import 'package:testapp/utils/APIHandler.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+
 
   @override
   State<StatefulWidget> createState() => _HomePageState();
@@ -32,7 +35,7 @@ class _HomePageState extends State<HomePage> {
 
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (BuildContext context) => LoginPage(),
+        builder: (BuildContext context) => const LoginPage(),
       ),
       (Route route) => false,
     );
@@ -59,33 +62,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Home"),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh_rounded),
-              tooltip: 'Refresh',
-              onPressed: () {
-                _fillUserDetails();
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.logout_rounded),
-              tooltip: 'Log out',
-              onPressed: () {
-                _handleLogOut();
-              },
-            ),
-          ],
+          title: const Text("Home")
         ),
         body: Column(
           children: [
-            Row(children: [
-              const Icon(Icons.person, size: 80.0),
-              Column(children: [
-                Text(email),
-                Text("Reward Points: $rewardPoints"),
-              ])
-            ]),
             Column(
               children: [
                 Center(
@@ -101,7 +81,7 @@ class _HomePageState extends State<HomePage> {
   void _openQuiz() {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (BuildContext context) => QuizPage(),
+        builder: (BuildContext context) => const QuizHomePage(),
       ),
       (Route route) => false,
     );

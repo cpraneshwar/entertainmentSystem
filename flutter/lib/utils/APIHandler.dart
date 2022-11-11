@@ -72,4 +72,13 @@ class APIhandler {
       return {'status': 'failure', 'response': e.response!.data};
     }
   }
+
+  Future<List> getQuizData(int category,String difficulty) async {
+    try {
+      Response response = await _dio.get('https://opentdb.com/api.php?amount=10&category=$category&difficulty=$difficulty&type=multiple');
+      return response.data['results'];
+    } on DioError catch(e){
+      return [{'status': 'failure', 'response': e.response!.data}];
+    }
+  }
 }
