@@ -2,20 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/screens/login.dart';
 import 'package:testapp/screens/quiz.dart';
-import 'package:testapp/screens/rewards.dart';
 
 import 'package:testapp/utils/APIHandler.dart';
 
 import 'home.dart';
 
-class UserPage extends StatefulWidget {
-  const UserPage({super.key});
+class RewardPage extends StatefulWidget {
+  const RewardPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _UserPageState();
+  State<StatefulWidget> createState() => _RewardPageState();
 }
 
-class _UserPageState extends State<UserPage> {
+class _RewardPageState extends State<RewardPage> {
   late String email = "Default User";
   late int points = 0;
   late double rewardProgress = 0;
@@ -72,50 +71,37 @@ class _UserPageState extends State<UserPage> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Color(0xFFB73E3E),
-          title: const Text("User Account"),
+          title: const Text("Redeem Rewards"),
           leading: IconButton(
-            icon: const Icon(Icons.home_rounded),
-            tooltip: 'Home',
+            icon: const Icon(Icons.arrow_back_ios_new),
+            tooltip: 'Back',
             onPressed: () {
-              _openHome();
+              Navigator.pop(context);
             },
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh_rounded),
-              tooltip: 'Refresh',
-              onPressed: () {
-                _fillUserDetails();
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.logout_rounded),
-              tooltip: 'Log out',
-              onPressed: () {
-                _handleLogOut();
-              },
-            ),
-          ],
         ),
         body: Column(
-          children: [
-            Row(children: [
-              const Icon(Icons.person, size: 80.0),
-              Column(children: [
-                Text(email),
-                Text("Reward Points: $rewardPoints"),
-              ]),
-            ]),
-            Center(
-                child: ElevatedButton(
-                    onPressed: () => {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (ctx) => const RewardPage()))
-                        },
-                    child: Text("Redeem Points")))
+          children: [Text("Redeem your points here"),
+
           ],
         ));
+  }
+
+  Widget imageCard(String label, String imageURL, dynamic onClick) {
+    return Container(
+        constraints: const BoxConstraints(maxHeight: 150, maxWidth: 150),
+        margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 50.0),
+        child: Card(
+            child: InkWell(
+              onTap: onClick,
+              child: Column(children: [
+                Image.asset(imageURL),
+                SizedBox(
+                  width: 150,
+                  height: 150,
+                  child: Center(child: Text(label)),
+                )
+              ]),
+            )));
   }
 }

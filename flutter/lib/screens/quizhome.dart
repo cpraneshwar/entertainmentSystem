@@ -61,6 +61,7 @@ class _QuizHomePageState extends State<QuizHomePage> {
 
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: Color(0xFFB73E3E),
           title: const Text("Quiz"),
           leading: IconButton(
             icon: const Icon(Icons.home_rounded),

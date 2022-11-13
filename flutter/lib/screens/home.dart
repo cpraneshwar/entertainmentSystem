@@ -3,13 +3,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/screens/login.dart';
 import 'package:testapp/screens/quiz.dart';
 import 'package:testapp/screens/quizhome.dart';
+import 'package:testapp/screens/user.dart';
 
 import 'package:testapp/utils/APIHandler.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
-
 
   @override
   State<StatefulWidget> createState() => _HomePageState();
@@ -59,23 +58,87 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void _openUser() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (BuildContext context) => const UserPage(),
+      ),
+      (Route route) => false,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Home")
-        ),
+            backgroundColor: Color(0xFFB73E3E),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.person_rounded),
+                tooltip: 'Account',
+                onPressed: () {
+                  _openUser();
+                },
+              ),
+            ],
+            title: const Text("Home")),
         body: Column(
           children: [
-            Column(
-              children: [
-                Center(
-                    child:
-                        imageCard("Quiz", "assets/images/quiz.png", _openQuiz)),
-                //Center(child: imageCard("Music", "assets/images/quiz.png",_openQuiz))
-              ],
-            )
+            Container(
+                margin: EdgeInsets.all(15),
+                padding: EdgeInsets.all(15),
+                height: 80,
+                decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Color(0xFFBCE0FF),
+                    Color(0xFFDBFFE6),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(5)
+                ),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                    onTap: _openQuiz,
+                    child: module("Quiz", null))),
+            Container(
+                margin: EdgeInsets.all(15),
+                padding: EdgeInsets.all(15),
+                height: 80,
+                decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0xFFDBFFE6),
+                        Color(0xFFBCE0FF),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(5)
+                ),
+                child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _openUser,
+                    child: module("Events", null)))
           ],
         ));
+  }
+
+  Widget module(title, image) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+        const Icon(
+          Icons.arrow_right_alt,
+          size: 35,
+        )
+        //Center(child: imageCard("Music", "assets/images/quiz.png",_openQuiz))
+      ],
+    );
   }
 
   void _openQuiz() {

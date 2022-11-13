@@ -50,7 +50,7 @@ class _QuizPageState extends State<QuizPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("Home")),
+        appBar: AppBar(backgroundColor: Color(0xFFB73E3E),title: const Text("Home")),
         body: Container(padding: EdgeInsets.all(20), child: quizContent()));
   }
 
