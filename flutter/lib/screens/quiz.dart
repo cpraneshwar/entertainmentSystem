@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:testapp/screens/quizend.dart';
 import 'package:testapp/screens/quizhome.dart';
 
 import 'package:testapp/utils/APIHandler.dart';
@@ -30,6 +32,7 @@ class _QuizPageState extends State<QuizPage> {
   String difficulty;
   bool fetched = false;
   late List quizData;
+  Color correctColor = Colors.blue;
 
   _QuizPageState(this.category, this.difficulty);
   @override
@@ -71,10 +74,11 @@ class _QuizPageState extends State<QuizPage> {
     if (!fetched) {
       return Container(child: Text("Quiz is being loaded"));
     } else {
-      print(quizData);
       List currentQuiz = quizData;
       String question = currentQuiz[_currentQuestion - 1]['question'];
-      List answers = currentQuiz[_currentQuestion - 1]['incorrect_answers'];
+      question = question.replaceAll("&quot;", "\'");
+      question = question.replaceAll("&#039;", "\'");
+      List answers = List.from(currentQuiz[_currentQuestion - 1]['incorrect_answers']);
       rng = Random().nextInt(3);
       _correctAnswer = currentQuiz[_currentQuestion - 1]['correct_answer'];
       answers.insert(rng, _correctAnswer);
@@ -99,42 +103,51 @@ class _QuizPageState extends State<QuizPage> {
               question,
               style: TextStyle(fontSize: 24),
             )),
-        quizOption(answers[0]),
-        quizOption(answers[1]),
-        quizOption(answers[2]),
-        quizOption(answers[3])
+        quizOption(answers[0],0),
+        quizOption(answers[1],1),
+        quizOption(answers[2],2),
+        quizOption(answers[3],3)
       ]);
     }
   }
 
   void _answerQuestion(String text) {
-    print(text);
+    setState(() {
+      correctColor=Colors.lightGreen;
+    });
     if (text == _correctAnswer) {
-      score += 10;
+      score += 1;
     }
-    if (_currentQuestion == 10) {
+
+    Future.delayed(const Duration(milliseconds: 1500),(){
+      correctColor = Colors.blue;
+        if (_currentQuestion == 10) {
       print(score);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (BuildContext context) => const QuizHomePage(),
+          builder: (BuildContext context) => QuizEndPage(score: score,category: category),
         ),
-        (Route route) => false,
+            (Route route) => false,
       );
     } else {
-      setState(() {
-        _currentQuestion++;
-      });
+    setState(() {
+    _currentQuestion++;
+    });
     }
   }
+    );
 
-  Widget quizOption(String text) {
+  }
+
+  Widget quizOption(String text, int index) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         style: ButtonStyle(
             textStyle:
                 MaterialStateProperty.all(const TextStyle(color: Colors.white)),
-            backgroundColor: MaterialStateProperty.all(Colors.blue)),
+            backgroundColor: (index==rng)?MaterialStateProperty.all(correctColor):MaterialStateProperty.all(Colors.blue)
+        ),
         onPressed: () => _answerQuestion(text),
         child: Text(text),
       ),

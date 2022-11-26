@@ -1,11 +1,12 @@
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class APIhandler {
   final Dio _dio = Dio();
-  final String hostname = "http://10.61.25.233:8000";
+  final String hostname = "http://eternalboredom.com";
 
   Future<Map> signUp(Map<String, dynamic> userData) async {
     try {
@@ -80,5 +81,18 @@ class APIhandler {
     } on DioError catch(e){
       return [{'status': 'failure', 'response': e.response!.data}];
     }
+  }
+
+  void uploadQuizData(int score,int total,int difficulty,int category) async {
+    Response response = await _dio.post(
+      '$hostname/challenges/add_quiz_history',
+      data: {
+        'totalQuestions': total,
+        'totalCorrectAns': score,
+        'difficulty':difficulty,
+        'category':category
+      },
+    );
+
   }
 }
