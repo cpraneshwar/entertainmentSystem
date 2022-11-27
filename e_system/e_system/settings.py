@@ -83,6 +83,17 @@ WSGI_APPLICATION = 'e_system.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+USE_MYSQL = False
+
+MYSQL_CONFIG = {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': 'unnovate',
+    'USER': 'unnovate',
+    'PASSWORD': 'unnovate',
+    'HOST': '127.0.0.1',
+    'PORT': '3306',
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -90,6 +101,9 @@ DATABASES = {
     }
 }
 
+
+if USE_MYSQL:
+    DATABASES['default'] = MYSQL_CONFIG
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
