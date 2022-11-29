@@ -26,7 +26,7 @@ class GetGraphAuthUrl(APIView):
         graph_auth_api = f"https://login.microsoftonline.com/common/oauth2/" +\
             f"v2.0/authorize?client_id={config.clientId}&"\
                 f"response_type=code&redirect_uri={config.redirectUri}&response_mode=form_post&scope=offline_access"+\
-                        f"%20calendars.read%20users.read&state={request.user.id}"
+                        f"%20calendars.read%20user.read&state={request.user.id}"
         return Response({"OauthUrl": graph_auth_api}, status=status.HTTP_200_OK)
 
 
