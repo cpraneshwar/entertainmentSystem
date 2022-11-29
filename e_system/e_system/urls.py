@@ -30,6 +30,7 @@ urlpatterns = [
     path('challenges/', include('challenges.urls')),
     path('auth/', views.obtain_auth_token),
     path('admin/', admin.site.urls),
+    path('ms_graph/', include('ms_graph.urls')),
     # path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
     # path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT})
 

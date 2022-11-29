@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'challenges',
     'rewards',
     'users',
+    'ms_graph',
     'drf_yasg',
     'rest_framework.authtoken',
     'django_filters'
