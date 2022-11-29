@@ -11,6 +11,6 @@ class Profile(models.Model):
     is_verified = models.BooleanField(default=False)
     cal_connected = models.BooleanField(default=False)
     cal_access_token = models.TextField(null=True, blank=True)
-    cal_access_expiry = models.DateField(null=True, blank=True)
+    cal_access_expiry = models.DateTimeField(null=True, blank=True)
     cal_refresh_token = models.TextField(null=True, blank=True)
 
