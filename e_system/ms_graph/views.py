@@ -37,7 +37,7 @@ class GraphRedirectUri(APIView):
             "scope": config.graphUserScopes,
             "grant_type": "authorization_code",
             "client_secret": config.clientSecret,
-            "redirect_uri": config.redirectUri,
+            "redirect_uri": config.accessRedirectUri,
             "code": request.data["code"],
         }
         resp = requests.post(graph_token_api, data=post_data).json()
