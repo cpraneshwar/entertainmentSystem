@@ -37,7 +37,7 @@ class UserSelfProfile(APIView):
 class SetDeviceId(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
+    def post(self, request):
         try:
             profile = Profile.objects.get(user=request.user)
         except ObjectDoesNotExist:
