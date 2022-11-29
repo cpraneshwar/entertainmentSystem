@@ -13,4 +13,4 @@ class Profile(models.Model):
     cal_access_token = models.TextField(null=True, blank=True)
     cal_access_expiry = models.DateTimeField(null=True, blank=True)
     cal_refresh_token = models.TextField(null=True, blank=True)
-    device_id = models.CharField(null=True, blank=True)
+    device_id = models.CharField(max_length=255, null=True, blank=True)

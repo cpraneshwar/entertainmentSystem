@@ -87,6 +87,9 @@ class Command(BaseCommand):
             for profile in profiles():
                 if is_user_free(profile):
                     notify_user(profile)
+                else:
+                    print(f"{profile.user.email} is busy, so haven't notified")
+            print(f"going to sleep for {sleep_time} seconds")
             sleep(sleep_time)
 
         return
