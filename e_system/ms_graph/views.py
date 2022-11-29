@@ -13,7 +13,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 from ms_graph  import config
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
+from ms_graph.utils import notify_user
 
 
 # Create your views here.
@@ -25,7 +26,7 @@ class GetGraphAuthUrl(APIView):
         graph_auth_api = f"https://login.microsoftonline.com/common/oauth2/" +\
             f"v2.0/authorize?client_id={config.clientId}&"\
                 f"response_type=code&redirect_uri={config.redirectUri}&response_mode=form_post&scope=offline_access"+\
-                        f"%20calendars.read&state={request.user.id}"
+                        f"%20calendars.read%20users.read&state={request.user.id}"
         return Response({"OauthUrl": graph_auth_api}, status=status.HTTP_200_OK)
 
 
@@ -44,7 +45,15 @@ class GraphRedirectUri(APIView):
         profile = Profile.objects.get(user__id=int(request.data["state"][0]))
         profile.cal_access_token = resp["access_token"]
         profile.cal_refresh_token = resp["refresh_token"]
-        profile.cal_connected = False
-        profile.cal_access_expiry = datetime.now()
+        profile.cal_connected = True
+        profile.cal_access_expiry = datetime.now() + timedelta(minutes=50)
         profile.save()
+        return Response(status=status.HTTP_200_OK)
+
+
+class DemoNotify(APIView):
+    def post(self, request):
+        profiles = Profile.objects.all()
+        for profile in profiles:
+            notify_user(profile)
         return Response(status=status.HTTP_200_OK)

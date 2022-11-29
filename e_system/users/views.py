@@ -32,3 +32,17 @@ class UserSelfProfile(APIView):
             raise ObjectDoesNotExist
         serializer = ProfileSerializer(profile, many=False)
         return Response(serializer.data)
+
+
+class SetDeviceId(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        try:
+            profile = Profile.objects.get(user=request.user)
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist
+        if request.data.get("device_id", None):
+            profile.device_id = request.data["device_id"]
+            profile.save()
+        return Response(status=status.HTTP_200_OK)
