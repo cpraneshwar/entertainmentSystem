@@ -9,6 +9,7 @@ import requests
 from ms_graph import config
 from datetime import datetime, timedelta
 from ms_graph.utils import notify_user
+from django.utils import timezone
 
 
 SCHEDULE_GRAPH_API = "https://graph.microsoft.com/v1.0/me/calendar/getschedule"
@@ -23,7 +24,7 @@ def graph_call(api, access_token, data={}, method="GET"):
     if method == "GET":
         resp = requests.get(api, headers=headers)
     elif method == "POST":
-        resp =requests.post(api, data=data, headers=headers)
+        resp =requests.post(api, json=data, headers=headers)
     return resp
 
 def refresh_access_token(profile):
@@ -38,20 +39,22 @@ def refresh_access_token(profile):
         }
     # refresh_access_token
     resp = requests.post(graph_token_api, data=post_data).json()
-    profile = Profile.objects.get(user__id=int(request.data["state"][0]))
     profile.cal_access_token = resp["access_token"]
     profile.cal_refresh_token = resp["refresh_token"]
-    profile.cal_connected = False
+    profile.cal_connected = True
     profile.cal_access_expiry = datetime.now() + timedelta(minutes=50)
     profile.save()
 
 
 def get_user_mail(profile):
     resp = graph_call(USER_GRAPH_API, profile.cal_access_token)
-    return resp.json()['mail']
+    if resp.json()['mail']:
+        return resp.json()['mail']
+    else:
+        return resp.json()['userPrincipalName']
 
 def is_user_free(profile):
-    if profile.cal_access_expiry > datetime.now():
+    if profile.cal_access_expiry > timezone.now():
         refresh_access_token(profile)
     mail = get_user_mail(profile)
     dt = datetime.now()
@@ -60,17 +63,17 @@ def is_user_free(profile):
     "schedules": [mail],
 
     "startTime": {
-         "dateTime": str(dt.strftime("%y-%m-%d")) +"T" + dt.strftime("%H:%M:%S"),
+         "dateTime": dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
          "timeZone": "UTC"
     },
     "endTime": {
-         "dateTime": str(end_dt.strftime("%y-%m-%d")) +"T" + end_dt.strftime("%H:%M:%S"),
+         "dateTime": end_dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
          "timeZone": "UTC"
     }
     }
     resp = graph_call(SCHEDULE_GRAPH_API, profile.cal_access_token, data=post_data, method="POST")
     resp = resp.json()
-    busy = int(resp['value']['availabilityView'])
+    busy = int(resp['value'][0]['availabilityView'])
     if busy:
         return False
     return True
@@ -84,7 +87,7 @@ class Command(BaseCommand):
         sleep_time = 15 *60
         while True:
             profiles = Profile.objects.filter(cal_connected=True)
-            for profile in profiles():
+            for profile in profiles:
                 if is_user_free(profile):
                     notify_user(profile)
                 else:
