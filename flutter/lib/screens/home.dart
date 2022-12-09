@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/screens/login.dart';
@@ -7,12 +9,16 @@ import 'package:testapp/screens/user.dart';
 
 import 'package:testapp/utils/APIHandler.dart';
 
+import '../utils/PushNotif.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
   State<StatefulWidget> createState() => _HomePageState();
 }
+
+
 
 class _HomePageState extends State<HomePage> {
   late String email = "Default User";
@@ -21,9 +27,12 @@ class _HomePageState extends State<HomePage> {
   late int rewardPoints = 0;
   late AnimationController controller;
   final APIhandler _apiHandler = APIhandler();
+  static late final FirebaseMessaging _firebaseMessaging;
   @override
   void initState() {
+    Firebase.initializeApp();
     _fillUserDetails();
+
     super.initState();
   }
 
@@ -45,6 +54,11 @@ class _HomePageState extends State<HomePage> {
     const storage = FlutterSecureStorage();
     Map response = await _apiHandler.getUser();
 
+    _firebaseMessaging = FirebaseMessaging.instance;
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    final pushNotificationService = PushNotificationService(_firebaseMessaging);
+    print(fcmToken);
+    _apiHandler.uploadDeviceID(fcmToken!);
     String em = await storage.read(key: 'email') as String;
     if (response['status'] == "failure") {
       _handleLogOut();
@@ -57,6 +71,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+
   @override
   void _openUser() {
     Navigator.of(context).pushAndRemoveUntil(
@@ -66,6 +81,7 @@ class _HomePageState extends State<HomePage> {
       (Route route) => false,
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -102,26 +118,7 @@ class _HomePageState extends State<HomePage> {
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                     onTap: _openQuiz,
-                    child: module("Quiz", null))),
-            Container(
-                margin: EdgeInsets.all(15),
-                padding: EdgeInsets.all(15),
-                height: 80,
-                decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0xFFDBFFE6),
-                        Color(0xFFBCE0FF),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(5)
-                ),
-                child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _openUser,
-                    child: module("Events", null)))
+                    child: module("Quiz", null)))
           ],
         ));
   }

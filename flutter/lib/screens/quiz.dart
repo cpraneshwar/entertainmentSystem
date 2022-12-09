@@ -15,7 +15,7 @@ class QuizPage extends StatefulWidget {
   const QuizPage({super.key, required this.category, required this.difficulty});
 
   final int category;
-  final String difficulty;
+  final int difficulty;
 
   @override
   State<StatefulWidget> createState() => _QuizPageState(category, difficulty);
@@ -29,10 +29,14 @@ class _QuizPageState extends State<QuizPage> {
   int rng = 0;
   int score = 0;
   int category;
-  String difficulty;
+  int difficulty;
   bool fetched = false;
+  bool answered = false;
+  int selected=-1;
   late List quizData;
   Color correctColor = Colors.blue;
+  List answers = [];
+  String question = "";
 
   _QuizPageState(this.category, this.difficulty);
   @override
@@ -53,7 +57,8 @@ class _QuizPageState extends State<QuizPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(backgroundColor: Color(0xFFB73E3E),title: const Text("Home")),
+        appBar: AppBar(
+            backgroundColor: Color(0xFFB73E3E), title: const Text("Home")),
         body: Container(padding: EdgeInsets.all(20), child: quizContent()));
   }
 
@@ -72,16 +77,33 @@ class _QuizPageState extends State<QuizPage> {
 
   Widget quizContent() {
     if (!fetched) {
-      return Container(child: Text("Quiz is being loaded"));
+      return CircularPercentIndicator(
+        radius: 25.0,
+        animation: true,
+        animationDuration: 250,
+        lineWidth: 5.0,
+        circularStrokeCap: CircularStrokeCap.round,
+        backgroundColor: Colors.blue,
+        progressColor: Colors.lightBlue,
+      );
     } else {
-      List currentQuiz = quizData;
-      String question = currentQuiz[_currentQuestion - 1]['question'];
-      question = question.replaceAll("&quot;", "\'");
-      question = question.replaceAll("&#039;", "\'");
-      List answers = List.from(currentQuiz[_currentQuestion - 1]['incorrect_answers']);
-      rng = Random().nextInt(3);
-      _correctAnswer = currentQuiz[_currentQuestion - 1]['correct_answer'];
-      answers.insert(rng, _correctAnswer);
+      if(selected==-1) {
+        List currentQuiz = quizData;
+        question = currentQuiz[_currentQuestion - 1]['question'];
+        question = question.replaceAll("&quot;", "\'");
+        question = question.replaceAll("&#039;", "\'");
+        answers = List.from(currentQuiz[_currentQuestion - 1]['incorrect_answers']);
+        rng = Random().nextInt(3);
+        _correctAnswer = currentQuiz[_currentQuestion - 1]['correct_answer'];
+        answers.insert(rng, _correctAnswer);
+        List filtered = [];
+        for (var element in answers) {
+          String filter = element.replaceAll("&quot;", "\'");
+          filter = filter.replaceAll("&#039;", "\'");
+          filtered.add(filter);
+        }
+        answers = filtered;
+      }
       return Column(children: [
         CircularPercentIndicator(
           radius: 50.0,
@@ -103,40 +125,41 @@ class _QuizPageState extends State<QuizPage> {
               question,
               style: TextStyle(fontSize: 24),
             )),
-        quizOption(answers[0],0),
-        quizOption(answers[1],1),
-        quizOption(answers[2],2),
-        quizOption(answers[3],3)
+        quizOption(answers[0], 0),
+        quizOption(answers[1], 1),
+        quizOption(answers[2], 2),
+        quizOption(answers[3], 3)
       ]);
     }
   }
 
-  void _answerQuestion(String text) {
+  void _answerQuestion(String text,int index) {
     setState(() {
-      correctColor=Colors.lightGreen;
+      answered = true;
+      selected=index;
     });
     if (text == _correctAnswer) {
       score += 1;
     }
 
-    Future.delayed(const Duration(milliseconds: 1500),(){
-      correctColor = Colors.blue;
-        if (_currentQuestion == 10) {
-      print(score);
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (BuildContext context) => QuizEndPage(score: score,category: category),
-        ),
-            (Route route) => false,
-      );
-    } else {
-    setState(() {
-    _currentQuestion++;
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      answered = false;
+      selected=-1;
+      if (_currentQuestion == 10) {
+        print(score);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) =>
+                QuizEndPage(score: score, category: category,difficulty: difficulty),
+          ),
+          (Route route) => false,
+        );
+      } else {
+        setState(() {
+          _currentQuestion++;
+        });
+      }
     });
-    }
-  }
-    );
-
   }
 
   Widget quizOption(String text, int index) {
@@ -146,9 +169,10 @@ class _QuizPageState extends State<QuizPage> {
         style: ButtonStyle(
             textStyle:
                 MaterialStateProperty.all(const TextStyle(color: Colors.white)),
-            backgroundColor: (index==rng)?MaterialStateProperty.all(correctColor):MaterialStateProperty.all(Colors.blue)
-        ),
-        onPressed: () => _answerQuestion(text),
+            backgroundColor: (answered)?((index == rng)
+                ? MaterialStateProperty.all(Colors.lightGreen)
+                : (index == selected)?MaterialStateProperty.all(Colors.redAccent):MaterialStateProperty.all(Colors.blueAccent)):(MaterialStateProperty.all(Colors.blue))),
+        onPressed: () => _answerQuestion(text,index),
         child: Text(text),
       ),
     );

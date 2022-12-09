@@ -27,6 +27,7 @@ class _QuizHomePageState extends State<QuizHomePage> {
   late double rewardProgress = 0;
   late int rewardPoints = 0;
   late AnimationController controller;
+  int _value = 0;
 
   List<Quiz> categData = <Quiz>[];
 
@@ -42,14 +43,67 @@ class _QuizHomePageState extends State<QuizHomePage> {
     super.initState();
   }
 
+  Widget module(title, image) {
+        return Center(child:Text(title,textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w600)));
+    }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> quizList = <Widget>[];
-    for (Quiz quiz in categData) {
-      quizList.add(ElevatedButton(
-          onPressed: () => _openQuiz(quiz.categoryID, "medium"),
-          child: Text(quiz.category)));
-    }
+    Widget content = Text("asdasd");
+    categData.asMap().forEach((index, element) {
+      Quiz quiz = element;
+      if (index % 2 == 0) {
+        content = Container(
+            margin: EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
+            height: 150,
+            width: 150,
+            decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Color(0xFFBCE0FF),
+                    Color(0xFFDBFFE6),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(5)
+            ),
+            child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _openQuiz(quiz.categoryID,_value),
+                child: module(quiz.category, null)));
+      } else {
+        quizList.add(Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            content,
+            content = Container(
+                margin: EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
+                height: 150,
+                width: 150,
+                decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0xFFDBFFE6),
+                        Color(0xFFBCE0FF)
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(5)
+                ),
+                child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => _openQuiz(quiz.categoryID,_value),
+                    child: module(quiz.category, null)))
+          ],
+        ));
+      }
+    });
     void _openHome() {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
@@ -74,11 +128,31 @@ class _QuizHomePageState extends State<QuizHomePage> {
         body: Container(
             padding: EdgeInsets.all(20),
             child: Column(
-              children: [Center(child: Column(children: quizList))],
+              children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List<Widget>.generate(
+              3,
+                  (int index) {
+                return ChoiceChip(
+                  label: Text(index==0?"Easy":index==1?"Medium":"Hard"),
+                  selectedColor: Colors.lightGreen.shade100,
+
+                  selected: _value == index,
+                  onSelected: (bool selected) {
+                    setState(() {
+                      _value = (selected ? index : null)!;
+                    });
+                  },
+                );
+              },
+            ).toList(),
+        )
+                ,Center(child: Column(children: quizList))],
             )));
   }
 
-  void _openQuiz(int category, String difficulty) {
+  void _openQuiz(int category, int difficulty) {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (BuildContext context) =>

@@ -6,7 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class APIhandler {
   final Dio _dio = Dio();
-  final String hostname = "http://eternalboredom.com";
+  final String hostname = "https://unnovent1.canadacentral.cloudapp.azure.com";
 
   Future<Map> signUp(Map<String, dynamic> userData) async {
     try {
@@ -74,24 +74,80 @@ class APIhandler {
     }
   }
 
-  Future<List> getQuizData(int category,String difficulty) async {
+  Future<String> getLinkURL() async {
+    const storage = FlutterSecureStorage();
+    String? token = await storage.read(key: 'authToken');
+    Response response = await _dio.get(
+      '$hostname/ms_graph/get_graph_auth_api/',
+      options: Options(
+        headers: {
+          'Authorization': 'Token $token',
+        },
+      ),
+    );
+    return response.data['OauthUrl'];
+  }
+
+  Future<List> getQuizData(int category,int difficulty) async {
+    var diffList = ["easy","medium","hard"];
+    String diff = diffList[difficulty];
     try {
-      Response response = await _dio.get('https://opentdb.com/api.php?amount=10&category=$category&difficulty=$difficulty&type=multiple');
+      Response response = await _dio.get('https://opentdb.com/api.php?amount=10&category=$category&difficulty=$diff&type=multiple');
       return response.data['results'];
     } on DioError catch(e){
       return [{'status': 'failure', 'response': e.response!.data}];
     }
   }
 
-  void uploadQuizData(int score,int total,int difficulty,int category) async {
+  void uploadDeviceID(String deviceID) async {
+    const storage = FlutterSecureStorage();
+    String? token = await storage.read(key: 'authToken');
     Response response = await _dio.post(
-      '$hostname/challenges/add_quiz_history',
+      '$hostname/users/set_device_id/',
+      data:{
+        'device_id':deviceID
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Token $token',
+        },
+      ),
+    );
+  }
+
+  Future<Map> removePoints(int point) async{
+    const storage = FlutterSecureStorage();
+    String? token = await storage.read(key: 'authToken');
+    Response response = await _dio.post(
+      '$hostname/rewards/withdraw_points',
+      data: {
+        'points': point
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Token $token',
+        },
+      ),
+    );
+    return {'status': 'success', 'data': response.data};
+  }
+
+  void uploadQuizData(int score,int total,int difficulty,int category) async {
+    const storage = FlutterSecureStorage();
+    String? token = await storage.read(key: 'authToken');
+    Response response = await _dio.post(
+      '$hostname/challenges/add_quiz_history/',
       data: {
         'totalQuestions': total,
         'totalCorrectAns': score,
         'difficulty':difficulty,
         'category':category
       },
+      options: Options(
+        headers: {
+          'Authorization': 'Token $token',
+        },
+      ),
     );
 
   }

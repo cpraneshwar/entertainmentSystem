@@ -5,6 +5,8 @@ import 'package:testapp/screens/quiz.dart';
 import 'package:testapp/screens/rewards.dart';
 
 import 'package:testapp/utils/APIHandler.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'home.dart';
 
@@ -20,7 +22,9 @@ class _UserPageState extends State<UserPage> {
   late int points = 0;
   late double rewardProgress = 0;
   late int rewardPoints = 0;
+  late String linkURL = "";
   late AnimationController controller;
+  late bool cal_connected = false;
   final APIhandler _apiHandler = APIhandler();
   @override
   void initState() {
@@ -50,12 +54,23 @@ class _UserPageState extends State<UserPage> {
     if (response['status'] == "failure") {
       _handleLogOut();
     } else {
+      bool connected = response['data']['cal_connected'];
+      if(!cal_connected){
+        linkURL = await getLinkURL();
+      }
       setState(() {
         rewardPoints = response['data']['reward_points'];
+        cal_connected = connected;
         rewardProgress = 0.4;
         email = em;
       });
     }
+  }
+
+  Future<String> getLinkURL() async {
+    String linkURL = await _apiHandler.getLinkURL();
+    print(linkURL);
+    return linkURL;
   }
 
   void _openHome() {
@@ -99,23 +114,43 @@ class _UserPageState extends State<UserPage> {
         ),
         body: Column(
           children: [
-            Row(children: [
+            Row(
+                mainAxisAlignment:MainAxisAlignment.spaceAround,
+                children: [
               const Icon(Icons.person, size: 80.0),
               Column(children: [
                 Text(email),
                 Text("Reward Points: $rewardPoints"),
               ]),
             ]),
-            Center(
-                child: ElevatedButton(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [ElevatedButton(
                     onPressed: () => {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (ctx) => const RewardPage()))
+                                  builder: (ctx) => RewardPage(points: rewardPoints))).then((value) => _fillUserDetails())
                         },
-                    child: Text("Redeem Points")))
+                    child: Text("Redeem Points")),
+                  ElevatedButton(
+                      onPressed: cal_connected?null:()=>_openBrowser(),
+                      child: cal_connected?Text("Calendar Linked"):Text("Link Outlook Calendar"))
+                ]
+            )
           ],
         ));
   }
+
+  void _openBrowser() async {
+    print(linkURL);
+    var uri = Uri.parse(linkURL);
+    var urllaunchable = await canLaunchUrl(uri); //canLaunch is from url_launcher package
+    if(urllaunchable){
+      await launchUrl(uri); //launch is from url_launcher package to launch URL
+    }else{
+      print("URL can't be launched.");
+    }
+  }
+
 }

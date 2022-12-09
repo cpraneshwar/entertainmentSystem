@@ -7,12 +7,13 @@ import 'package:testapp/screens/quizhome.dart';
 import 'package:testapp/utils/APIHandler.dart';
 
 class QuizEndPage extends StatefulWidget {
-  const QuizEndPage({super.key, required this.score, required this.category});
+  const QuizEndPage({super.key, required this.score, required this.category, required this.difficulty});
 
   final int score;
   final int category;
+  final int difficulty;
   @override
-  State<StatefulWidget> createState() => _QuizEndPageState(score,category);
+  State<StatefulWidget> createState() => _QuizEndPageState(score,category,difficulty);
 }
 
 class _QuizEndPageState extends State<QuizEndPage> {
@@ -20,18 +21,27 @@ class _QuizEndPageState extends State<QuizEndPage> {
   final int _totalQuestions = 10;
   int score;
   int category;
+  int difficulty;
+  int multiplier=5;
   bool fetched = false;
   late List quizData;
 
-  _QuizEndPageState(this.score,this.category);
+  _QuizEndPageState(this.score,this.category,this.difficulty);
   @override
   void initState() {
     super.initState();
+    if(difficulty==1){
+      multiplier=10;
+    }
+    else if(difficulty==2){
+      multiplier=20;
+    }
+    multiplier=score*multiplier;
     _sendQuizData();
   }
 
   void _sendQuizData(){
-    _apiHandler.uploadQuizData(score,10,1,category);
+    _apiHandler.uploadQuizData(score,10,difficulty,category);
   }
 
   @override
@@ -60,6 +70,8 @@ class _QuizEndPageState extends State<QuizEndPage> {
           backgroundColor: Colors.yellow,
           progressColor: Colors.green,
         ),
+        Text("You earned $multiplier points",
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
         Container(
             padding: EdgeInsets.all(20),
             child: SizedBox(
