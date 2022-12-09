@@ -29,6 +29,7 @@ class AddQuizHistory(APIView):
                 Qh.difficulty = serializer.validated_data['difficulty']
                 if Qh.totalCorrectAns >  Qh.totalQuestions:
                     return Response({"error": "totalCorrectAns can't be morethan totalQuestions"})
+                Qh.category = serializer.validated_data["category"]
                 Qh.save()
                 profile = Profile.objects.get(user=request.user)
                 reward_points = Qh.totalCorrectAns * DTYPE_SCORE_MULTI[Qh.difficulty]

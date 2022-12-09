@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     'challenges',
     'rewards',
     'users',
+    'ms_graph',
     'drf_yasg',
     'rest_framework.authtoken',
     'django_filters'
@@ -58,7 +61,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'e_system.urls'
-
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -81,6 +84,17 @@ WSGI_APPLICATION = 'e_system.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+USE_MYSQL = False
+
+MYSQL_CONFIG = {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': 'unnovate',
+    'USER': 'unnovate',
+    'PASSWORD': 'unnovate',
+    'HOST': '127.0.0.1',
+    'PORT': '3306',
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -88,6 +102,9 @@ DATABASES = {
     }
 }
 
+
+if USE_MYSQL:
+    DATABASES['default'] = MYSQL_CONFIG
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
