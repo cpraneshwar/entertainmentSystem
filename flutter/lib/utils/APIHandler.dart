@@ -6,7 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class APIhandler {
   final Dio _dio = Dio();
-  final String hostname = "http://eternalboredom.com";
+  final String hostname = "https://unnovent1.canadacentral.cloudapp.azure.com";
 
   Future<Map> signUp(Map<String, dynamic> userData) async {
     try {
